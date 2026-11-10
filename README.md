@@ -1,122 +1,88 @@
-# web-programming-2026-template
+# Purrfect Backend (онлайн магазин котів)
 
-A reusable Django project with no bundled application, SQLite, and Django's
-standard admin, authentication, sessions, messages, and staticfiles support.
+## Команда
+- Сахарова Юлія
+- Паращій Аліна 
 
-## Local setup
+## Короткий опис
+Даний проєкт має на меті створити зручний та функціональний сайт, який слугуватиме маркетплейсом для продажу/покупки котиків.  
+Заводчики зможуть публікувати своїх котів, вказуючи деталі та умови продажу, а користувачі - шукати тих тварин, які найбільше відповідають їх вподобанням та зв'язуватися із заводчиками для уточнення. 
 
-Requires the latest patch release of Python 3.12, 3.13, or 3.14. Run these commands from the project directory containing
-`manage.py`.
+## Основні сторінки сайту
+- **Основна (Home)** — містить опис сайту, відповіді на поширені питання тощо  
+- **Коти (каталог)** + можливість переходу на сторінку окремого кота
+- **Заводчики** + можливість переходу на сторінку окремого заводчика
+- **Для покупців** — інформація, яку покупці повинні знати перед покупкою  
+- **Для заводчиків** — інформація, яку повинні знати заводчики перед розміщенням оголошень  
+- **Контакти** — способи зв'язку з адміністрацією  
+- **Профіль** — перегляд особистої інформації + подання заявки та підтвердження статусу заводчика за потреби
 
-1. Create and activate a virtual environment:
+## Ролі користувачів
+- Гість
+- Авторизований користувач (потенційний покупець)
+- Заводчик
+- Адміністратор
 
-   ```bash
-   python -m venv .venv
-   
-   # for linux/macos
-   source .venv/bin/activate
-   # for Windows:
-   .venv\Scripts\activate
-   ```
+## Функціонал
+### Для гостей
+- Лише перегляд усієї інформації
+- Можливість реєстрації
+### Для авторизованих користувачів (потенційних покупців)
+- Функціонал для гостей
+- Логін
+- Перегляд та редагування профілю + подання заявки на підтвердження статусу заводчика за потреби
+- Зберігати котиків у "обране"
+- Бачити контакти заводчиків
+- Залишати відгуки
+- Можливість комунікувати з ШІ ботом
+### Для заводчиків
+- Функціонал для авторизованих користувачів (крім лишати відгуки самому собі)
+- Можливість додавати та редагувати пости своїх котів
+### Для адміністраторів
+- Практично все: редагування та видалення постів, користувачів, заводчиків за необхідності
+- Підтвердження статусу заводчиків
 
-2. Install dependencies:
+## Цікаві деталі
+- Підтвердження статусу заводчика через надсилання форми, яку потім "перевіряє" адміністратор. Під час очікування профіль заводчика має лише функціонал авторизованого користувача, допоки не відбудеться підтвердження   
+- Нотифікації на email (при реєстрації, щоб упевнитись, що пошта реальна та належить користувачу)  
 
-   ```bash
-   python -m pip install -r requirements-dev.txt
-   ```
-
-
-3. Apply migrations to create the local SQLite database:
-
-   ```bash
-   python manage.py migrate
-   ```
-
-4. Start the development server:
-
-   ```bash
-   python manage.py runserver
-   ```
-
-## Endpoints
-
-With the server running at `http://127.0.0.1:8000`:
-
-| URL | Behavior |
-| --- | --- |
-| http://127.0.0.1:8000/ | No application homepage; may show Django's development welcome page while `DEBUG = True` |
-| http://127.0.0.1:8000/admin/ | Django admin, available after applying migrations |
-
-With `DEBUG = False`, unmatched URLs such as `/` return HTTP 404.
-
-To create an account for admin login, run this after applying migrations:
-
+## Як запустити проєкт
+### На бекенді:
+1. Створити та активувати віртуальне середовище
 ```bash
-python manage.py createsuperuser
+python -m venv .venv
+
+# for linux/macos
+source .venv/bin/activate
+# for Windows:
+.venv\Scripts\activate
 ```
 
-## Add your first application
-
-1. Create an app from the directory containing `manage.py` (replace `myapp`
-   with your application name):
-
-   ```bash
-   python manage.py startapp myapp
-   ```
-
-2. Add its generated configuration class, `myapp.apps.MyappConfig`, to
-   `INSTALLED_APPS` in `config/settings.py`.
-3. Define your views and create `myapp/urls.py` with their URL patterns.
-4. Register that URLconf in `config/urls.py` using `path()` and `include()`,
-   choosing a URL prefix for the app and retaining the admin route.
-
-See the official Django 6.1 tutorial for
-[views and URL registration](https://docs.djangoproject.com/en/6.1/intro/tutorial01/)
-and [app registration and models](https://docs.djangoproject.com/en/6.1/intro/tutorial02/).
-
-## Start a REST API
-
-Django REST framework and `django-cors-headers` are included and configured.
-Install the project dependencies with `python -m pip install -r requirements-dev.txt`.
-Create your own app, serializers, views, and URL patterns; no API app or
-authentication scheme is supplied.
-
-## Git attributes
-
-Git detects text files automatically and normalizes them to LF. Checkouts use
-LF on Linux and Windows, while `.bat` and `.cmd` files use CRLF. Binary files
-are auto-detected and left unchanged, helping avoid newline-only diffs.
-
-
-## Code style and submission verification
-
-All submissions are required to adhere to PEP-8, Django best practices, and standard HTML/CSS/JS formatting. A deterministic cross-platform utility is provided to help you check and format your code.
-
-### 1. Verification (Check Mode)
-Before submitting, verify that all files adhere to the required standards:
-
+2. Встановити залежності  
 ```bash
-python check_submission.py
+pip install -r requirements.txt
 ```
 
-Passing these checks confirms code style, not functional API behavior. Before submitting an API, also write and run functional tests for its endpoints. If style checks fail, review the error output or run the auto-formatter below.
-
-### 2. Auto-Formatting
-To automatically format Python files, fix safe PEP-8 rules, format Django HTML templates, and format CSS/JS static files:
-
+3. Запустити міграції, щоб створити БД
 ```bash
-python check_submission.py --format
+python manage.py migrate
 ```
 
-### 3. PyCharm Integration
-If you use PyCharm:
-- **One-Click Run:** In the top-right toolbar run configurations dropdown, select **"Verify Submission"** or **"Format Project"** and click the green **Play** button.
+4. Запустити сервер  
+```bash
+python manage.py runserver
+```
 
-## Development only
+### На фронтенді:  
+1. Запустити через окремий термінал (одночасно з бекендом)  
+```bash
+python -m http.server 5500
+```
 
-The included settings use `DEBUG = True`, a development secret key, and a local
-SQLite database. The default mailer uses the console backend: email is printed
-to the process's console instead of being delivered.
+2. Якщо проєкт вже запускався, то варто очистити кеш командою `ctrl+shift+R`
 
-This configuration and Django's development server are not suitable for
-production deployment.
+Сайт буде доступним за адресою http://localhost:5500
+
+
+**P.S. В процесі розробки вебсайту можливі розбіжності із планом або додавання нових функцій.  
+У такому випадку README.md буде відповідно оновлено.**
