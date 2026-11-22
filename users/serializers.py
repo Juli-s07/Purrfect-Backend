@@ -1,6 +1,8 @@
 from django.contrib.auth import password_validation
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model, password_validation
+
+User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     password_confirmation = serializers.CharField(max_length = 128, write_only = True)
