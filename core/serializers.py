@@ -3,8 +3,10 @@ from django.utils import timezone
 from rest_framework import serializers
 from .models import Breed, Breeder, Cat
 
-import logging
-logger = logging.getLogger(__name__)
+from django_countries.serializer_fields import CountryField
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class BreedSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,15 +15,16 @@ class BreedSerializer(serializers.ModelSerializer):
 
 
 class BreederShortSerializer(serializers.ModelSerializer):
+    country_code = CountryField(country_dict=True)
     class Meta:
         model = Breeder
-        fields = ["id", "name", "country", "city"]
+        fields = ["id", "name", "country_code", "city"]
 
 class CatQuerySerializer(serializers.Serializer):
     search = serializers.CharField(required=False)
     breed_id = serializers.IntegerField(required=False)
     breeder_id = serializers.IntegerField(required=False)
-    country = serializers.CharField(required=False)
+    country_code = serializers.CharField(required=False, max_length=2)
     min_price = serializers.IntegerField(required=False, min_value=0)
     max_price = serializers.IntegerField(required=False, min_value=0)
     status = serializers.ChoiceField(choices=["available", "reserved", "sold"], required=False)
@@ -70,6 +73,15 @@ class CatListResponseSerializer(serializers.Serializer):
 
 class BreederSerializer(serializers.ModelSerializer):
     cats = CatShortSerializer(many=True, read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), source="user", write_only=True,
+        validators=[UniqueValidator(
+            queryset=Breeder.objects.all(),
+            message="This user already has a breeder profile",
+        )],
+    )
+    country_code = CountryField(country_dict=True)
+    email = serializers.EmailField(source="user.email", read_only=True)
     class Meta:
         model = Breeder
-        fields = ["id", "name", "country", "city", "phone", "email", "description", "cats"]
+        fields = ["id", "user_id", "name", "country_code", "city", "phone", "email", "description", "cats"]

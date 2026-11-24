@@ -59,8 +59,8 @@ class CatListView(APIView):
             cats = cats.filter(breed_id=p["breed_id"])
         if "breeder_id" in p:
             cats = cats.filter(breeder_id=p["breeder_id"])
-        if "country" in p:
-            cats = cats.filter(breeder__country__iexact=p["country"])
+        if "country_code" in p:
+            cats = cats.filter(breeder__country_code=p["country_code"]).upper()
         if "min_price" in p:
             cats = cats.filter(price__gte=p["min_price"])
         if "max_price" in p:
