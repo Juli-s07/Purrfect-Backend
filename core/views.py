@@ -12,9 +12,36 @@ from .serializers import CatSerializer, CatShortSerializer, CatListResponseSeria
     CatQuerySerializer
 
 from .permissions import IsAdminOrReadOnly, IsBreederOrAdminOrReadOnly, IsOwnerBreederOrAdminOrReadOnly
+from rest_framework.permissions import AllowAny
+
+from .content import HOME, FOR_BUYERS, FOR_BREEDERS, CONTACTS
 
 def is_duplicate(errors, field):
     return any(error.code == "unique" for error in errors.get(field, []))
+
+class HomeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(HOME)
+
+class Buyers(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(FOR_BUYERS)
+
+class Breeders(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(FOR_BREEDERS)
+
+class Contacts(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        return Response(CONTACTS)
 
 class CatListView(APIView):
     permission_classes = [IsBreederOrAdminOrReadOnly]
