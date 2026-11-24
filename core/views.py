@@ -87,7 +87,7 @@ class CatListView(APIView):
     def post(self, request):
         data = request.data.copy()
         if not request.user.is_staff:
-            data["breeder"] = request.user.breeder.id
+            data["breeder_id"] = request.user.breeder.id
         serializer = CatSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -107,8 +107,9 @@ class CatDetailView(APIView):
         self.check_object_permissions(request, cat)
         data = request.data.copy()
         if not request.user.is_staff:
+            data.pop("breeder_id", None)
             data.pop("breeder", None)
-        serializer = CatSerializer(cat, data=request.data, partial=True)
+        serializer = CatSerializer(cat, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         cat = serializer.save()
         return Response(serializer.data)
