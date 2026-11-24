@@ -147,6 +147,7 @@ class BreederDetailView(APIView):
 
     def patch(self, request, pk):
         breeder = get_object_or_404(Breeder, pk=pk)
+        self.check_object_permissions(request, breeder)
         serializer = BreederSerializer(breeder, data=request.data, partial=True)
         if not serializer.is_valid():
             if is_duplicate(serializer.errors, "email"):
@@ -157,6 +158,7 @@ class BreederDetailView(APIView):
 
     def delete(self, request, pk):
         breeder = get_object_or_404(Breeder, pk=pk)
+        self.check_object_permissions(request, breeder)
         try:
             breeder.delete()
         except ProtectedError:
