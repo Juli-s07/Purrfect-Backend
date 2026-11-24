@@ -59,8 +59,8 @@ class CatListView(APIView):
             cats = cats.filter(breed_id=p["breed_id"])
         if "breeder_id" in p:
             cats = cats.filter(breeder_id=p["breeder_id"])
-        if "country" in p:
-            cats = cats.filter(breeder__country__iexact=p["country"])
+        if "country_code" in p:
+            cats = cats.filter(breeder__country_code=p["country_code"].upper())
         if "min_price" in p:
             cats = cats.filter(price__gte=p["min_price"])
         if "max_price" in p:
@@ -87,7 +87,7 @@ class CatListView(APIView):
     def post(self, request):
         data = request.data.copy()
         if not request.user.is_staff:
-            data["breeder"] = request.user.breeder.id
+            data["breeder_id"] = request.user.breeder.id
         serializer = CatSerializer(data=data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -107,8 +107,9 @@ class CatDetailView(APIView):
         self.check_object_permissions(request, cat)
         data = request.data.copy()
         if not request.user.is_staff:
+            data.pop("breeder_id", None)
             data.pop("breeder", None)
-        serializer = CatSerializer(cat, data=request.data, partial=True)
+        serializer = CatSerializer(cat, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         cat = serializer.save()
         return Response(serializer.data)
@@ -147,6 +148,7 @@ class BreederDetailView(APIView):
 
     def patch(self, request, pk):
         breeder = get_object_or_404(Breeder, pk=pk)
+        self.check_object_permissions(request, breeder)
         serializer = BreederSerializer(breeder, data=request.data, partial=True)
         if not serializer.is_valid():
             if is_duplicate(serializer.errors, "email"):
@@ -157,6 +159,7 @@ class BreederDetailView(APIView):
 
     def delete(self, request, pk):
         breeder = get_object_or_404(Breeder, pk=pk)
+        self.check_object_permissions(request, breeder)
         try:
             breeder.delete()
         except ProtectedError:

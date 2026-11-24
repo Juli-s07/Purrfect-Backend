@@ -1,14 +1,14 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django_countries.fields import CountryField
 
 class Breeder(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="breeder")
     name = models.CharField(max_length=150)
-    country = models.CharField(max_length=150)
+    country_code = CountryField(blank_label="Choose the country", verbose_name="country")
     city = models.CharField(max_length=150)
     phone = models.CharField(max_length=20)
-    email = models.EmailField(unique=True)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self):
