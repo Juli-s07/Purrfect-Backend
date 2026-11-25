@@ -11,6 +11,7 @@ from .models import Cat, Breed, Breeder
 from .serializers import CatSerializer, CatShortSerializer, CatListResponseSerializer, BreedSerializer, BreederSerializer, BreederShortSerializer, \
     CatQuerySerializer
 
+from .pedigree import build_family_tree
 from .permissions import IsAdminOrReadOnly, IsBreederOrAdminOrReadOnly, IsOwnerBreederOrAdminOrReadOnly
 from rest_framework.permissions import AllowAny
 
@@ -18,6 +19,23 @@ from .content import HOME, FOR_BUYERS, FOR_BREEDERS, CONTACTS
 
 def is_duplicate(errors, field):
     return any(error.code == "unique" for error in errors.get(field, []))
+
+
+def pedigree_node(cat, depth, ancestors=frozenset()):
+    if cat is None or depth <= 0 or cat.pk in ancestors:
+        return None
+    ancestors = ancestors | {cat.pk}
+    return {
+        "id": cat.pk,
+        "name": cat.name,
+        "sex": cat.sex,
+        "breed": cat.breed.name,
+        "photo_url": cat.photo_url,
+        "status": cat.status,
+        "mother": pedigree_node(cat.mother, depth - 1, ancestors),
+        "father": pedigree_node(cat.father, depth - 1, ancestors),
+    }
+
 
 class HomeView(APIView):
     permission_classes = [AllowAny]
@@ -119,6 +137,46 @@ class CatDetailView(APIView):
         self.check_object_permissions(request, cat)
         cat.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CatPedigreeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        cat = get_object_or_404(Cat, pk=pk)
+        return Response(pedigree_node(cat, depth=5))
+
+
+class BreederAlumniView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        get_object_or_404(Breeder, pk=pk)
+        cats = Cat.objects.filter(breeder_id=pk, status=Cat.Status.SOLD)
+        return Response(CatShortSerializer(cats, many=True).data)
+
+
+class BreederPedigreeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        breeder = get_object_or_404(Breeder, pk=pk)
+        cats = list(Cat.objects.filter(breeder_id=pk).select_related(
+            "mother", "father", "breed"))
+        seen = {cat.pk for cat in cats}
+        queue = list(cats)
+        while queue:
+            cat = queue.pop()
+            for parent in (cat.mother, cat.father):
+                if parent is not None and parent.pk not in seen:
+                    seen.add(parent.pk)
+                    cats.append(parent)
+                    queue.append(parent)
+
+        return Response({
+            "breeder": BreederShortSerializer(breeder).data,
+            "families": build_family_tree(cats),
+        })
 
 
 class BreederListView(APIView):

@@ -31,3 +31,7 @@ indent = 2
 format_css = true
 format_js = true
 ignore = "H006,H031"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]

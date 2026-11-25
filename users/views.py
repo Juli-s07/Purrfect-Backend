@@ -22,11 +22,16 @@ class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         u = request.user
+        breeder = getattr(u, "breeder", None)
         return Response({
+            "id": u.id,
             "username": u.username,
             "first_name": u.first_name,
             "last_name": u.last_name,
             "email": u.email,
+            "role": u.role,
+            "is_staff": u.is_staff,
+            "breeder_id": breeder.id if breeder else None,
             "date_joined": u.date_joined,
         })
 
