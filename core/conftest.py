@@ -24,6 +24,22 @@ def breeder(db):
 
 
 @pytest.fixture
+def other_breeder(db):
+    user = get_user_model().objects.create_user(
+        username="otherbreeder",
+        email="other@example.com",
+        password="pass12345",
+    )
+    return Breeder.objects.create(
+        user=user,
+        name="Other cattery",
+        country_code="PL",
+        city="Warsaw",
+        phone="111",
+    )
+
+
+@pytest.fixture
 def breed(db):
     return Breed.objects.create(name="Test breed")
 
