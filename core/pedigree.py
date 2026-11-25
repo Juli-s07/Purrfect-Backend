@@ -13,10 +13,6 @@ def _sort_key(cat):
 def _reference(cat):
     if cat is None:
         return None
-    return {"id": cat.pk, "name": cat.name}
-
-
-def _node(cat, mother, father):
     return {
         "id": cat.pk,
         "name": cat.name,
@@ -25,10 +21,15 @@ def _node(cat, mother, father):
         "photo_url": cat.photo_url,
         "status": cat.status,
         "birth_date": getattr(cat, "birth_date", None),
-        "mother": _reference(mother),
-        "father": _reference(father),
-        "children": [],
     }
+
+
+def _node(cat, mother, father):
+    node = _reference(cat)
+    node["mother"] = _reference(mother)
+    node["father"] = _reference(father)
+    node["children"] = []
+    return node
 
 
 def build_family_tree(cats, max_depth=MAX_DEPTH):
