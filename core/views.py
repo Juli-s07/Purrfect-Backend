@@ -19,6 +19,23 @@ from .content import HOME, FOR_BUYERS, FOR_BREEDERS, CONTACTS
 def is_duplicate(errors, field):
     return any(error.code == "unique" for error in errors.get(field, []))
 
+
+def pedigree_node(cat, depth, ancestors=frozenset()):
+    if cat is None or depth <= 0 or cat.pk in ancestors:
+        return None
+    ancestors = ancestors | {cat.pk}
+    return {
+        "id": cat.pk,
+        "name": cat.name,
+        "sex": cat.sex,
+        "breed": cat.breed.name,
+        "photo_url": cat.photo_url,
+        "status": cat.status,
+        "mother": pedigree_node(cat.mother, depth - 1, ancestors),
+        "father": pedigree_node(cat.father, depth - 1, ancestors),
+    }
+
+
 class HomeView(APIView):
     permission_classes = [AllowAny]
 
@@ -119,6 +136,14 @@ class CatDetailView(APIView):
         self.check_object_permissions(request, cat)
         cat.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CatPedigreeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        cat = get_object_or_404(Cat, pk=pk)
+        return Response(pedigree_node(cat, depth=5))
 
 
 class BreederListView(APIView):
