@@ -11,6 +11,7 @@ from .models import Cat, Breed, Breeder
 from .serializers import CatSerializer, CatShortSerializer, CatListResponseSerializer, BreedSerializer, BreederSerializer, BreederShortSerializer, \
     CatQuerySerializer
 
+from .pedigree import build_family_tree
 from .permissions import IsAdminOrReadOnly, IsBreederOrAdminOrReadOnly, IsOwnerBreederOrAdminOrReadOnly
 from rest_framework.permissions import AllowAny
 
@@ -153,6 +154,29 @@ class BreederAlumniView(APIView):
         get_object_or_404(Breeder, pk=pk)
         cats = Cat.objects.filter(breeder_id=pk, status=Cat.Status.SOLD)
         return Response(CatShortSerializer(cats, many=True).data)
+
+
+class BreederPedigreeView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        breeder = get_object_or_404(Breeder, pk=pk)
+        cats = list(Cat.objects.filter(breeder_id=pk).select_related(
+            "mother", "father", "breed"))
+        seen = {cat.pk for cat in cats}
+        queue = list(cats)
+        while queue:
+            cat = queue.pop()
+            for parent in (cat.mother, cat.father):
+                if parent is not None and parent.pk not in seen:
+                    seen.add(parent.pk)
+                    cats.append(parent)
+                    queue.append(parent)
+
+        return Response({
+            "breeder": BreederShortSerializer(breeder).data,
+            "families": build_family_tree(cats),
+        })
 
 
 class BreederListView(APIView):
