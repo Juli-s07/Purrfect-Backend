@@ -8,6 +8,7 @@ urlpatterns = [
     path("cats/<int:pk>/pedigree/", views.CatPedigreeView.as_view()),
     path("cats/<int:pk>/", views.CatDetailView.as_view()),
     path("breeders/", views.BreederListView.as_view()),
+    path("breeders/<int:pk>/alumni/", views.BreederAlumniView.as_view()),
     path("breeders/<int:pk>/", views.BreederDetailView.as_view()),
     path("breeds/", views.BreedListView.as_view()),
     path("breeds/<int:pk>/", views.BreedDetailView.as_view()),

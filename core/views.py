@@ -146,6 +146,15 @@ class CatPedigreeView(APIView):
         return Response(pedigree_node(cat, depth=5))
 
 
+class BreederAlumniView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        get_object_or_404(Breeder, pk=pk)
+        cats = Cat.objects.filter(breeder_id=pk, status=Cat.Status.SOLD)
+        return Response(CatShortSerializer(cats, many=True).data)
+
+
 class BreederListView(APIView):
     permission_classes = [IsAdminOrReadOnly]
 
