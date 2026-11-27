@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.hashers import check_password
+from django.db.models import Q
 
 User = get_user_model()
 
@@ -52,6 +53,15 @@ class ResendCodeView(APIView):
 
 class RegisterView(APIView):
     def post(self, request):
+        email = str(request.data.get("email", "")).strip()
+        username = str(request.data.get("username", "")).strip()
+
+        User.objects.filter(
+            Q(email__iexact=email) | Q(username__iexact=username),
+            is_active=False,
+            email_verification__isnull=False,
+        ).delete() #видалення покинутих реєстрацій
+
         serializer = UserSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         if User.objects.filter(email__iexact=serializer.validated_data["email"]).exists():
