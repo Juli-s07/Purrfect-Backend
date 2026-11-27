@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-User = get_user_model()
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -7,6 +6,49 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
 from .emails import send_verification_code
 from .serializers import UserSerializer
+from datetime import timedelta
+from django.utils import timezone
+from rest_framework.exceptions import ValidationError
+from django.contrib.auth.hashers import check_password
+
+User = get_user_model()
+
+CODE_TIME = timedelta(minutes=10)       # код діє 10 хвилин
+MAX_ATTEMPTS = 5
+RESEND_COOLDOWN = timedelta(seconds=60)
+
+class VerifyEmailView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        code = str(request.data.get("code", "")).strip()
+        invalid = ValidationError({"code": "Invalid or expired code"})
+
+        user = User.objects.filter(email__iexact=email, is_active=False).first()
+        verification = getattr(user, "email_verification", None) if user else None
+        if verification is None:
+            raise invalid
+        if timezone.now() - verification.created_at > CODE_TIME or verification.attempts >= MAX_ATTEMPTS:
+            raise invalid
+        verification.attempts += 1
+        verification.save(update_fields=["attempts"])
+
+        if not check_password(code, verification.code_hash):
+            raise invalid
+
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+        verification.delete()
+        return Response({"detail": "Email verified"})
+
+class ResendCodeView(APIView):
+    def post(self, request):
+        user = User.objects.filter(email__iexact=request.data.get("email", ""), is_active=False).first()
+        verification = getattr(user, "email_verification", None) if user else None
+        if verification and timezone.now() - verification.created_at < RESEND_COOLDOWN:
+            raise ValidationError({"detail": "Please wait a minute before requesting a new code"})
+        if user:
+            send_verification_code(user)
+        return Response({"detail": "If the account exists, a new code was sent"})
 
 class RegisterView(APIView):
     def post(self, request):
