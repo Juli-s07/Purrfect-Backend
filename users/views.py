@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from .emails import send_verification_code
 from .serializers import UserSerializer
 
 class RegisterView(APIView):
@@ -16,7 +16,10 @@ class RegisterView(APIView):
             return Response({"email": ["This email has already been taken."]},
                             status=status.HTTP_409_CONFLICT)
         user = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+        send_verification_code(user)
+        return Response({"email": user.email, "detail": "Verification code sent"}, status=status.HTTP_201_CREATED,)
 
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
