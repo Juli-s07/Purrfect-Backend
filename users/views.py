@@ -28,7 +28,7 @@ class VerifyEmailView(APIView):
         verification = getattr(user, "email_verification", None) if user else None
         if verification is None:
             raise invalid
-        if timezone.now() - verification.created_at > CODE_TIME or verification.attempts >= MAX_ATTEMPTS:
+        if timezone.now() - verification.sent_at > CODE_TIME or verification.attempts >= MAX_ATTEMPTS:
             raise invalid
         verification.attempts += 1
         verification.save(update_fields=["attempts"])
@@ -45,7 +45,7 @@ class ResendCodeView(APIView):
     def post(self, request):
         user = User.objects.filter(email__iexact=request.data.get("email", ""), is_active=False).first()
         verification = getattr(user, "email_verification", None) if user else None
-        if verification and timezone.now() - verification.created_at < RESEND_COOLDOWN:
+        if verification and timezone.now() - verification.sent_at < RESEND_COOLDOWN:
             raise ValidationError({"detail": "Please wait a minute before requesting a new code"})
         if user:
             send_verification_code(user)
