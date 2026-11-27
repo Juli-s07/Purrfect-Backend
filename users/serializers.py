@@ -1,6 +1,6 @@
-from django.contrib.auth import password_validation
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, password_validation
+from rest_framework.validators import UniqueValidator
 
 User = get_user_model()
 
@@ -13,7 +13,11 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True,
                                      "min_length": 8},
                         "email": {"required": True,
-                                  "allow_blank": False}}
+                                  "allow_blank": False,
+                                  "validators": [UniqueValidator(queryset=User.objects.all(), lookup="iexact",
+                                                                message="This email has already been taken.",)],
+                                  }
+                        }
 
     def validate_password(self, value):
         password_validation.validate_password(value)
