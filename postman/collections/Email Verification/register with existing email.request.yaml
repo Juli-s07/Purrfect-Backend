@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base}}/auth/register/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: Alex
+    - type: text
+      key: password
+      value: g66DG78%
+    - type: text
+      key: password_confirmation
+      value: g66DG78%
+    - type: text
+      key: email
+      value: julia.love2809@gmail.com
+examples: ./.resources/register with existing email.resources/examples
+order: 3000

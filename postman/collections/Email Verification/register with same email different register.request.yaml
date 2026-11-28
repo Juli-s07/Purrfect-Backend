@@ -1,0 +1,24 @@
+$kind: http-request
+url: "{{base}}/auth/register/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: Bob
+      disabled: false
+    - type: text
+      key: password
+      value: 123456$ABc
+      disabled: false
+    - type: text
+      key: password_confirmation
+      value: 123456$ABc
+      disabled: false
+    - type: text
+      key: email
+      value: Julia.love2809@gmail.com
+      disabled: false
+examples: .resources/register with same email different register.resources/examples
+order: 4000

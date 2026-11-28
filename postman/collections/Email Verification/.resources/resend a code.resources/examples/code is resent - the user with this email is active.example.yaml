@@ -1,0 +1,35 @@
+$kind: http-example
+name: code is resent / the user with this email is active
+request:
+  url: "{{base}}/auth/resend-code/"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: username
+        value: Julia
+      - type: text
+        key: email
+        value: julia.love2809@gmail.com
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Date: Fri, 27 Nov 2026 23:27:48 GMT
+    Server: WSGIServer/0.2 CPython/3.12.10
+    Content-Type: application/json
+    Vary: Accept, origin
+    Allow: POST, OPTIONS
+    X-Frame-Options: DENY
+    Content-Length: "55"
+    X-Content-Type-Options: nosniff
+    Referrer-Policy: same-origin
+    Cross-Origin-Opener-Policy: same-origin
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "If the account exists, a new code was sent"
+      }
+order: 2000

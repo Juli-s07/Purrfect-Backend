@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base}}/auth/verify-email/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: email
+      value: julia.love2809@gmail.com
+      disabled: false
+    - type: text
+      key: code
+      value: "770788"
+      disabled: false
+auth:
+  type: noauth
+examples: .resources/email verification.resources/examples
+order: 5000

@@ -1,0 +1,39 @@
+$kind: http-example
+request:
+  url: "{{base}}/auth/verify-email/"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: email
+        value: julia.love2809@gmail.com
+        disabled: false
+      - type: text
+        key: code
+        value: "307438"
+        disabled: false
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Date: Sat, 28 Nov 2026 11:51:57 GMT
+    Server: WSGIServer/0.2 CPython/3.12.10
+    Content-Type: application/json
+    Vary: Accept, origin
+    Allow: POST, OPTIONS
+    X-Frame-Options: DENY
+    Content-Length: "97"
+    X-Content-Type-Options: nosniff
+    Referrer-Policy: same-origin
+    Cross-Origin-Opener-Policy: same-origin
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Validation error",
+        "errors": {
+          "code": "This email is already verified. Please log in."
+        }
+      }
+order: 7000
