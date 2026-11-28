@@ -1,0 +1,57 @@
+$kind: http-example
+name: user with this username/email already exists
+request:
+  url: "{{base}}/auth/register/"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: username
+        value: user123
+        description: ""
+        disabled: false
+      - type: text
+        key: email
+        value: user123@gmail.com
+        description: ""
+        disabled: false
+      - type: text
+        key: password
+        value: x3b78B#$
+        description: ""
+        disabled: false
+      - type: text
+        key: password_confirmation
+        value: x3b78B#$
+        description: ""
+        disabled: false
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Date: Sat, 28 Nov 2026 10:46:39 GMT
+    Server: WSGIServer/0.2 CPython/3.12.10
+    Content-Type: application/json
+    Vary: Accept, origin
+    Allow: POST, OPTIONS
+    X-Frame-Options: DENY
+    Content-Length: "145"
+    X-Content-Type-Options: nosniff
+    Referrer-Policy: same-origin
+    Cross-Origin-Opener-Policy: same-origin
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Validation error",
+        "errors": {
+          "username": [
+            "A user with that username already exists."
+          ],
+          "email": [
+            "This email has already been taken."
+          ]
+        }
+      }
+order: 1000

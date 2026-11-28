@@ -12,5 +12,5 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = UserAdmin.add_fieldsets + (
         ("Role", {"fields": ("role",)}),
     )
-    list_display = ("username", "email", "role", "is_staff")
+    list_display = ("username", "email", "role", "is_active", "is_staff")
     list_filter = UserAdmin.list_filter + ("role",)

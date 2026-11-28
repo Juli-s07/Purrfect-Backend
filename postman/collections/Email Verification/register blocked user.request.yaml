@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base}}/auth/register/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: user123
+      description: ""
+      disabled: false
+    - type: text
+      key: email
+      value: user123@gmail.com
+      description: ""
+      disabled: false
+    - type: text
+      key: password
+      value: x3b78B#$
+      description: ""
+      disabled: false
+    - type: text
+      key: password_confirmation
+      value: x3b78B#$
+      description: ""
+      disabled: false
+examples: .resources/register blocked user.resources/examples
+order: 7000

@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base}}/auth/resend-code/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: Julia
+    - type: text
+      key: email
+      value: julia.love2809@gmail.com
+examples: .resources/resend a code.resources/examples
+order: 6000

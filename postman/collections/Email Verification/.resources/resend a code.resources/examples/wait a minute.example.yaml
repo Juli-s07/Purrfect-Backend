@@ -1,0 +1,34 @@
+$kind: http-example
+request:
+  url: "{{base}}/auth/resend-code/"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: username
+        value: Julia
+      - type: text
+        key: email
+        value: julia.love2809@gmail.com
+response:
+  statusCode: 429
+  statusText: Too Many Requests
+  headers:
+    Date: Sat, 28 Nov 2026 12:14:26 GMT
+    Server: WSGIServer/0.2 CPython/3.12.10
+    Content-Type: application/json
+    Vary: Accept, origin
+    Allow: POST, OPTIONS
+    X-Frame-Options: DENY
+    Content-Length: "63"
+    X-Content-Type-Options: nosniff
+    Referrer-Policy: same-origin
+    Cross-Origin-Opener-Policy: same-origin
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "Please wait a minute before requesting a new code."
+      }
+order: 3000

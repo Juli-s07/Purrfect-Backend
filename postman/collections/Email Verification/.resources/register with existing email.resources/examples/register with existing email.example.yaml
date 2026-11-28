@@ -1,0 +1,45 @@
+$kind: http-example
+request:
+  url: "{{base}}/auth/register/"
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: username
+        value: Alex
+      - type: text
+        key: password
+        value: g66DG78%
+      - type: text
+        key: password_confirmation
+        value: g66DG78%
+      - type: text
+        key: email
+        value: julia.love2809@gmail.com
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+    Date: Fri, 27 Nov 2026 21:58:56 GMT
+    Server: WSGIServer/0.2 CPython/3.12.10
+    Content-Type: application/json
+    Vary: Accept, origin
+    Allow: POST, OPTIONS
+    X-Frame-Options: DENY
+    Content-Length: "88"
+    X-Content-Type-Options: nosniff
+    Referrer-Policy: same-origin
+    Cross-Origin-Opener-Policy: same-origin
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Validation error",
+        "errors": {
+          "email": [
+            "This email has already been taken."
+          ]
+        }
+      }
+order: 1000

@@ -1,0 +1,21 @@
+$kind: http-request
+name: register Julia
+url: "{{base}}/auth/register/"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: Julia
+    - type: text
+      key: password
+      value: 123456$ABc
+    - type: text
+      key: password_confirmation
+      value: 123456$ABc
+    - type: text
+      key: email
+      value: julia.love2809@gmail.com
+examples: .resources/register Julia-1.resources/examples
+order: 1000
