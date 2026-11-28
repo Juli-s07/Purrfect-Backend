@@ -22,19 +22,27 @@ class VerifyEmailView(APIView):
     def post(self, request):
         email = request.data.get("email")
         code = str(request.data.get("code", "")).strip()
-        invalid = ValidationError({"code": "Invalid or expired code"})
+
+        user = User.objects.filter(email__iexact=email).first()
+        if user and user.is_active:
+            raise ValidationError({"code": "This email is already verified. Please log in."})
 
         user = User.objects.filter(email__iexact=email, is_active=False).first()
         verification = getattr(user, "email_verification", None) if user else None
         if verification is None:
-            raise invalid
-        if timezone.now() - verification.sent_at > CODE_TIME or verification.attempts >= MAX_ATTEMPTS:
-            raise invalid
+            raise ValidationError({"code": "No pending verification for this email. Please register or request a new code."})
+        if timezone.now() - verification.sent_at > CODE_TIME:
+            raise ValidationError({"code": "This code has expired. Please request a new one."})
+        if verification.attempts >= MAX_ATTEMPTS:
+            raise ValidationError({"code": "Too many attempts. Please request a new code."})
         verification.attempts += 1
         verification.save(update_fields=["attempts"])
 
         if not check_password(code, verification.code_hash):
-            raise invalid
+            left = MAX_ATTEMPTS - verification.attempts
+            if left <= 0:
+                raise ValidationError({"code": "Too many attempts. Please request a new code."})
+            raise ValidationError({"code": f"Incorrect code. Attempts left: {left}."})
 
         user.is_active = True
         user.save(update_fields=["is_active"])
