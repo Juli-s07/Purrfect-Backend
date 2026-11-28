@@ -53,10 +53,10 @@ class ResendCodeView(APIView):
     def post(self, request):
         user = User.objects.filter(email__iexact=request.data.get("email", ""), is_active=False).first()
         verification = getattr(user, "email_verification", None) if user else None
-        if verification and timezone.now() - verification.sent_at < RESEND_COOLDOWN:
-            raise ValidationError({"detail": "Please wait a minute before requesting a new code"})
-        if user:
-            send_verification_code(user)
+        if verification:
+            if timezone.now() - verification.sent_at < RESEND_COOLDOWN:
+                return Response({"detail": "Please wait a minute before requesting a new code."}, status=429,)
+            send_verification_code(user) # відлік часу на фронтенді
         return Response({"detail": "If the account exists, a new code was sent"})
 
 class RegisterView(APIView):
